@@ -1,38 +1,21 @@
-const fetchPost = async (postId: string) => {
-  const post = await fetch(
-    `https://mon-cours-next-js-13.vercel.app/api/posts/${postId}`,
-    {
-      method: "GET",
-    }
-  );
-  return post.json();
-};
-
-export async function generateMetadata({ params }: any) {
-  const { post } = await fetchPost(params.id);
-
-  return {
-    title: post[0].title,
-    description: post[0].title,
-    openGraph: {
-      title: post[0].title,
-      description: post[0].title,
-      url: `/posts/${params.id}`,
-      siteName: "Codewithguillaume",
-      images: [
-        {
-          url: post[0].img_url,
-          width: 1260,
-          height: 800,
-        },
-      ],
-      locale: "en-US",
-      type: "website",
+async function getPostById(postId: string) {
+  const response = await fetch(`http://localhost:3000/api/posts/${postId}`, {
+    method: "GET",
+    next: {
+      revalidate: 5000,
     },
-  };
+  });
+
+  return response.json();
 }
 
-export default function PostID({ params }: any) {
-  // fetch from here with the params id
-  return <main>Post {params.id}</main>;
+export default async function PostID({ params }: any) {
+  const { post } = await getPostById(params.id);
+
+  return (
+    <main>
+      <h1>{post.title}</h1>
+      <p>{post.description}</p>
+    </main>
+  );
 }

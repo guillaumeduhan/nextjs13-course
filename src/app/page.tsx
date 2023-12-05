@@ -1,23 +1,32 @@
-import type { Metadata } from "next";
-
-export const metadata: Metadata = {
-  title: "My page title",
-  description: "This a description",
-  openGraph: {
-    title: "My page title",
-    description: "This a description",
-    url: "mywebsite.com",
-    siteName: "Codewithguillaume",
-    images: [
-      {
-        url: "/mywebsite.png",
-        width: 1260,
-        height: 800,
-      }
-    ]
-  },
-};
-
 export default function Home() {
-  return <main>Main page</main>;
+  
+  async function savePost(data: FormData) {
+    'use server';
+
+    const title = data.get('title');
+    const description = data.get('description');
+    
+    const response = await fetch('http://localhost:3000/api/posts',
+      {
+        method: 'POST',
+        body: JSON.stringify({ title, description }),
+        cache: 'no-cache'
+      }
+    )
+
+    if (response.ok) {
+      const posts = await response.json()
+      console.log(posts)
+    }
+  }
+  
+  return (
+    <main className="flex gap-2 m-4">
+      <form action={savePost} className="grid">
+        <input className="p-2 border" name="title" type="text" />
+        <textarea className="p-2 border" name="description" />
+        <button className="px-4 py-5 text-black bg-sky-500" type="submit">Submit</button>
+      </form>
+    </main>
+  );
 }
